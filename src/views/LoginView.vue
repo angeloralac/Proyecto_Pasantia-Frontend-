@@ -1,14 +1,45 @@
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import apiClient from '../api/axios' // <-- Importamos tu cliente de Axios configurado
+
+const router = useRouter()
+
 
 const email = ref('')
 const contrasena = ref('')
 
-const handleLogin = () => {
-  console.log('Datos listos para autenticar:', {
-    email: email.value,
-    contrasena: contrasena.value
-  })
+
+const errorMsg = ref('')
+const isLoading = ref(false)
+
+const handleLogin = async () => {
+  errorMsg.value = ''
+  isLoading.value = true
+  
+  try {
+   
+    const response = await apiClient.post('/login', {
+      email: email.value,
+      contrasena: contrasena.value
+    })
+
+
+    const token = response.data.user.token
+
+    
+    localStorage.setItem('token', token)
+
+    alert('¡Bienvenido al sistema!')
+    router.push('/dashboard') 
+
+  } catch (error) {
+    console.error(error)
+   
+    errorMsg.value = error.response?.data?.mensaje || 'Error al iniciar sesión'
+  } finally {
+    isLoading.value = false
+  }
 }
 </script>
 
@@ -16,18 +47,22 @@ const handleLogin = () => {
   <div>
     <h2>Iniciar Sesión</h2>
     
+    <p v-if="errorMsg" style="color: red; font-weight: bold;">{{ errorMsg }}</p>
+
     <form @submit.prevent="handleLogin">
       <div>
         <label>Correo:</label>
-        <input v-model="email" type="email" required />
+        <input v-model="email" type="email" required :disabled="isLoading" />
       </div>
 
       <div>
         <label>Contraseña:</label>
-        <input v-model="contrasena" type="password" required />
+        <input v-model="contrasena" type="password" required :disabled="isLoading" />
       </div>
 
-      <button type="submit">Ingresar</button>
+      <button type="submit" :disabled="isLoading">
+        {{ isLoading ? 'Ingresando...' : 'Ingresar' }}
+      </button>
     </form>
 
     <p>
