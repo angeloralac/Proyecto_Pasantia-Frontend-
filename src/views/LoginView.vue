@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import apiClient from '../api/axios' // <-- Importamos tu cliente de Axios configurado
+import apiClient from '../api/axios'
 
 const router = useRouter()
 
@@ -18,24 +18,18 @@ const handleLogin = async () => {
   isLoading.value = true
   
   try {
-   
-    const response = await apiClient.post('/login', {
+    const response = await apiClient.post('/users/login', {
       email: email.value,
       contrasena: contrasena.value
     })
 
-
     const token = response.data.user.token
-
-    
     localStorage.setItem('token', token)
-
     alert('¡Bienvenido al sistema!')
     router.push('/dashboard') 
 
   } catch (error) {
     console.error(error)
-   
     errorMsg.value = error.response?.data?.mensaje || 'Error al iniciar sesión'
   } finally {
     isLoading.value = false
