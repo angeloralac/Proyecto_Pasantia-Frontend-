@@ -5,10 +5,8 @@ import apiClient from '../api/axios'
 
 const router = useRouter()
 
-
 const email = ref('')
 const contrasena = ref('')
-
 
 const errorMsg = ref('')
 const isLoading = ref(false)
@@ -22,7 +20,6 @@ const handleLogin = async () => {
       email: email.value,
       contrasena: contrasena.value
     })
-
     const token = response.data.user.token
     localStorage.setItem('token', token)
     alert('¡Bienvenido al sistema!')

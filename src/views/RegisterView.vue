@@ -5,12 +5,10 @@ import apiClient from '../api/axios'
 
 const router = useRouter()
 
-
 const nombre = ref('')
 const email = ref('')
 const contrasena = ref('')
 
-// Estados de control para la petición
 const errorMsg = ref('')
 const isLoading = ref(false)
 
@@ -19,19 +17,16 @@ const handleRegister = async () => {
   isLoading.value = true
 
   try {
-   
+
     await apiClient.post('/users', {
       nombre: nombre.value,
       email: email.value,
       contrasena: contrasena.value
     })
-
     alert('¡Usuario registrado con éxito! Ahora puedes iniciar sesión.')
     router.push('/login') 
-
   } catch (error) {
     console.error(error)
-  
     errorMsg.value = error.response?.data?.mensaje || 'Error al registrar el usuario'
   } finally {
     isLoading.value = false
@@ -72,3 +67,4 @@ const handleRegister = async () => {
     </p>
   </div>
 </template>
+

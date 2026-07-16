@@ -10,7 +10,6 @@ const apiClient = axios.create({
   }
 })
 
-
 apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token')
@@ -23,7 +22,6 @@ apiClient.interceptors.request.use(
     return Promise.reject(error)
   }
 )
-
 
 apiClient.interceptors.response.use(
   (response) => response, 
