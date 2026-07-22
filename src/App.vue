@@ -1,18 +1,16 @@
 <script setup>
-
+import { RouterView } from 'vue-router'
 </script>
 
 <template>
-  <header class="app-header">
-      <span class="header-tag">Sistema de Gestión</span>
-      <h1 class="app-title">Punto de Venta</h1>
-      <div class="header-divider"></div>
+  <v-app>
+    <!-- Encabezado superior -->
+    <header class="pa-4 bg-gray-lighten-3 text-center border-b">
+      <span class="text-caption text-grey-darken-1">Sistema de Gestión</span>
+      <h1 class="text-h5 font-weight-bold">Punto de Venta</h1>
     </header>
- <main class="app-content">
-      <routerView />
-    </main>
+
+    <!-- La vista del Dashboard se renderiza a pantalla completa -->
+    <RouterView />
+  </v-app>
 </template>
-
-<style scoped>
-
-</style>

@@ -1,24 +1,19 @@
 <script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router';
-
-const router = useRouter()
-
-const handleLogout = () => {
-  localStorage.removeItem ('token')
-  alert('Saliendo del sistema...')
-  router.push('/login')
-
-}
+import DashboardCrud from '../components/dashboardCrud.vue'
+import DashboardContent from '../components/dashboardContent.vue'
+import UserProfileDrawer from '../components/dashboardUserProfile.vue'
 </script>
 
 <template>
-  <div>
-    <h2>Dashboard (Punto de Venta)</h2>
-    <p>¡Bienvenido al sistema! Has iniciado sesión con éxito.</p>
-    <button 
-    @click="handleLogout">Cerrar Sesion
-  </button>
-  
-  </div>
+  <v-layout>
+    
+      <!-- 2. BARRA IZQUIERDA COMO componente -->
+    <DashboardCrud />
+
+    <!-- 2. BARRA DERECHA COMO componente -->
+    <UserProfileDrawer />
+
+    <!-- 3. ZONA CENTRAL COMO componente -->
+    <DashboardContent/>
+  </v-layout>
 </template>
