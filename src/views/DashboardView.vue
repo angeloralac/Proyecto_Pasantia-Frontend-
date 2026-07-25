@@ -6,14 +6,10 @@ import UserProfileDrawer from '../components/dashboardUserProfile.vue'
 
 <template>
   <v-layout>
-    
-      <!-- 2. BARRA IZQUIERDA COMO componente -->
     <DashboardCrud />
 
-    <!-- 2. BARRA DERECHA COMO componente -->
     <UserProfileDrawer />
-
-    <!-- 3. ZONA CENTRAL COMO componente -->
+   
     <DashboardContent/>
   </v-layout>
 </template>

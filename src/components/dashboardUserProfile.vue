@@ -9,13 +9,24 @@ const emailUsuario = ref('')
 const idUsuario = ref('')
 
 onMounted(() => {
-  nombreUsuario.value = localStorage.getItem('nombre')
-  emailUsuario.value = localStorage.getItem('email')
-  idUsuario.value = localStorage.getItem('id') 
+
+  const userString = localStorage.getItem('user')
+  if (userString) {
+    try {
+      const userObj = JSON.parse(userString)
+      nombreUsuario.value = userObj.nombre || userObj.name || 'Usuario'
+      emailUsuario.value = userObj.email
+      idUsuario.value = userObj.id 
+    } catch (error) {
+      console.error("Error al leer los datos del usuario:", error)
+    }
+  }
 })
 
 const handleLogout = () => {
-  localStorage.removeItem('token', 'email', 'nombre', 'id')
+  localStorage.removeItem('token')
+  localStorage.removeItem('user')
+  
   alert('Saliendo del sistema...')
   router.push('/login')
 }
@@ -32,7 +43,6 @@ const handleLogout = () => {
         ¡Bienvenido, {{ nombreUsuario }}!
       </h3>
       
-      <!-- NUEVA SECCIÓN: Datos del usuario con íconos de Vuetify -->
       <div class="my-3 bg-grey-lighten-4 rounded pa-2 mx-2">
         <p class="text-body-2 text-grey-darken-2 mb-1 d-flex align-center justify-center">
           <v-icon icon="mdi-email-outline" size="small" class="mr-2"></v-icon>
@@ -43,7 +53,6 @@ const handleLogout = () => {
           Usuario ID: {{ idUsuario }}
         </p>
       </div>
-      <!-- FIN DE NUEVA SECCIÓN -->
 
       <p class="text-caption text-grey">Sesión activa</p>
     </div>

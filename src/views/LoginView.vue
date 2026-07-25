@@ -1,70 +1,47 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import apiClient from '../api/axios'
+
+import { useUser } from '../composables/useUser'
 
 const router = useRouter()
 
-const email = ref('')
-const contrasena = ref('')
+const { loginUser, isLoading, errorResponse } = useUser()
 
-
-const errorMsg = ref('')
-const isLoading = ref(false)
+const payload = ref({
+  email: '',
+  contrasena: ''
+})
 
 const handleLogin = async () => {
-  errorMsg.value = ''
-  isLoading.value = true
-  
-  try {
-    const response = await apiClient.post('/users/login', {
-      email: email.value,
-      contrasena: contrasena.value
-    
-    })
-    const token = response.data.user.token
-    localStorage.setItem('token', token)
-    localStorage.setItem('email', response.data.user.email)
-    localStorage.setItem('nombre', response.data.user.name)
-    localStorage.setItem('id', response.data.user.id)
-    alert('¡Bienvenido al sistema!')
-    router.push('/dashboard') 
-
-  } catch (error) {
-    console.error(error)
-    errorMsg.value = error.response?.data?.mensaje || 'Error al iniciar sesión'
-  } finally {
-    isLoading.value = false
-  }
+  await loginUser(payload.value)
+  if (!errorResponse.value) {
+  alert('¡Bienvenido al sistema!')
+  router.push('/dashboard') 
+}
 }
 </script>
 
 <template>
-  <!-- Un contenedor simple con un fondo gris bajito -->
   <v-container class="bg-grey-lighten-4 pa-6 rounded-lg" style="max-width: 500px; margin: 50px auto !important;">
     
     <h2>Iniciar Sesión</h2>
     
-    <!-- Alerta roja de error sencilla (solo sale si hay un errorMsg) -->
-    <!-- Alerta roja de error con botón de cerrar que limpia el mensaje -->
-<v-alert 
-  v-if="errorMsg" 
-  type="error" 
-  class="my-4"
-  closable
-  @click:close="errorMsg = ''"
->
-  {{ errorMsg }}
-</v-alert>
+    <v-alert 
+      v-if="errorResponse" 
+      type="error" 
+      class="my-4"
+      closable
+      @click:close="errorResponse = null"
+    >
+      {{ errorResponse }}
+    </v-alert>
 
-    <!-- Tu formulario conectado a tu función handleLogin -->
     <v-form @submit.prevent="handleLogin">
       
-
-
-      <!-- Campo de correo simple -->
+    
       <v-text-field
-        v-model="email"
+        v-model="payload.email"
         label="Correo:"
         type="email"
         variant="outlined"
@@ -72,9 +49,8 @@ const handleLogin = async () => {
         required
       ></v-text-field>
 
-      <!-- Campo de contraseña simple -->
       <v-text-field
-        v-model="contrasena"
+        v-model="payload.contrasena"
         label="Contraseña:"
         type="password"
         variant="outlined"
@@ -82,7 +58,6 @@ const handleLogin = async () => {
         required
       ></v-text-field>
 
-      <!-- Botón de Vuetify con tu animación de carga -->
       <v-btn 
         type="submit" 
         color="primary" 
@@ -94,7 +69,6 @@ const handleLogin = async () => {
       </v-btn>
     </v-form>
 
-  
     <p class="mt-4 text-center">
       ¿No tienes cuenta? 
       <router-link to="/register">Regístrate aquí</router-link>
