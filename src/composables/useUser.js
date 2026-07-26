@@ -34,8 +34,9 @@ export function useUser() {
         data.value = response.data
         
         localStorage.setItem('token', data.value.token)
+        localStorage.setItem('userId', response.data.user.id)
        localStorage.setItem('user', JSON.stringify(data.value.user))
-
+      
     } catch (error) { 
         console.log(error)
         errorResponse.value = error.response?.data?.mensaje || 'Error al iniciar sesión'

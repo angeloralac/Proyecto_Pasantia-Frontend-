@@ -1,7 +1,7 @@
 <script setup>
 import DashboardCrud from '../components/dashboardCrud.vue'
-import DashboardContent from '../components/dashboardContent.vue'
 import UserProfileDrawer from '../components/dashboardUserProfile.vue'
+// Eliminamos la importación de DashboardContent porque el contenido ahora será dinámico
 </script>
 
 <template>
@@ -10,6 +10,8 @@ import UserProfileDrawer from '../components/dashboardUserProfile.vue'
 
     <UserProfileDrawer />
    
-    <DashboardContent/>
+    <v-main>
+      <router-view></router-view> 
+    </v-main>
   </v-layout>
 </template>

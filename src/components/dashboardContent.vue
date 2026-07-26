@@ -19,9 +19,7 @@ const props = defineProps({
 
       <v-card class="pa-6 rounded-lg elevation-1">
         <slot>
-          <div class="text-body-1 text-grey-darken-2">
-            Selecciona una opción del menú izquierdo para gestionar tus datos. Aquí adentro se mostrarán tus tablas y formularios del CRUD.
-          </div>
+         
         </slot>
       </v-card>
     </v-container>
