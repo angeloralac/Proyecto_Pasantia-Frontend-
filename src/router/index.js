@@ -3,6 +3,11 @@ import LoginView from '../views/LoginView.vue'
 import RegisterView from '../views/RegisterView.vue'
 import DashboardView from '../views/DashboardView.vue'
 
+import ArticulosView from '../views/ArticulosView.vue'
+import ClientesView from '@/views/ClientesView.vue'
+import UsuariosView from '@/views/UsuariosView.vue'
+
+
 const router = createRouter({
   history: createWebHistory(),
   routes: [
@@ -23,7 +28,20 @@ const router = createRouter({
     {
       path: '/dashboard',
       name: 'dashboard',
-      component: DashboardView
+      component: DashboardView,
+      children: [
+        {
+          path: 'articulos', 
+          name: 'articulos',
+          component: ArticulosView
+        },
+        { path: 'clientes', 
+          component: ClientesView 
+        },
+        { path: 'usuarios', 
+          component: UsuariosView 
+        }
+      ]
     }
   ]
 })

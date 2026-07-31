@@ -1,6 +1,17 @@
+<script setup>
+import DashboardCrud from '../components/dashboardCrud.vue'
+import UserProfileDrawer from '../components/dashboardUserProfile.vue'
+// Eliminamos la importación de DashboardContent porque el contenido ahora será dinámico
+</script>
+
 <template>
-  <div>
-    <h2>Dashboard (Punto de Venta)</h2>
-    <p>¡Bienvenido al sistema! Has iniciado sesión con éxito.</p>
-  </div>
+  <v-layout>
+    <DashboardCrud />
+
+    <UserProfileDrawer />
+   
+    <v-main>
+      <router-view></router-view> 
+    </v-main>
+  </v-layout>
 </template>
