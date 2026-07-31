@@ -1,6 +1,7 @@
 <script setup>
 import { onMounted } from 'vue'
 import { useCrud } from '../composables/useCrud'
+import { useArticuloUI } from '@/composables/useArticuloUI'
 
 // Invocamos el composable genérico pasándole la ruta de artículos
 const {
@@ -15,16 +16,8 @@ const {
   eliminarItem: eliminarArticulo
 } = useCrud('/articulos')
 
-const headers = [
-  { title: 'ID', key: 'id' },
-  { title: 'Cód. Barras', key: 'codigo_barras' },
-  { title: 'Nombre', key: 'nombre' },
-  { title: 'Descripción', key: 'descripcion' },
-  { title: 'Stock', key: 'stock' },
-  { title: 'Precio Venta', key: 'precio_venta' },
-  { title: 'Precio Costo', key: 'precio_costo' },
-  { title: 'Acciones', key: 'acciones', sortable: false }
-]
+const { headers } = useArticuloUI()
+
 
 onMounted(() => {
   obtenerArticulos()
@@ -33,7 +26,7 @@ onMounted(() => {
 
 <template>
   <v-container>
-    
+
     <!-- Botón Nuevo -->
     <v-btn color="primary" class="mb-4" prepend-icon="mdi-plus" @click="abrirModalCrear">
       Nuevo Artículo
@@ -51,7 +44,7 @@ onMounted(() => {
     <v-dialog v-model="dialogVisible" max-width="500px">
       <v-card>
         <v-card-title>{{ modoEdicion ? 'Editar Artículo' : 'Crear Artículo' }}</v-card-title>
-        
+
         <v-card-text>
           <v-text-field v-model="formulario.codigo_barras" label="Código de Barras" type="number"></v-text-field>
           <v-text-field v-model="formulario.nombre" label="Nombre"></v-text-field>

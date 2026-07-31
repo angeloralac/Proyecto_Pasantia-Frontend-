@@ -1,18 +1,23 @@
 import { ref } from 'vue'
 import apiClient from '../api/axios' 
+import { useUserRepo } from './useUserRepo'
 
 export function useUser() {
   const data = ref(null)
   const errorResponse = ref(null) 
   const isLoading = ref(false)
+const { getAll: getAllRepo, createuser: createUserRepo } = useUserRepo();
+  const payload = ref({
+  email: '',
+  contrasena: ''
+})
 
   const createUser = async (payload) => {
     try {
         isLoading.value = true
         errorResponse.value = null 
-        
-        const response = await apiClient.post('/users', payload)
-        data.value = response.data
+  
+        data.value = await createUserRepo(payload)
         
         localStorage.setItem('token', data.value.token)
         localStorage.setItem('user', JSON.stringify(data.value.user))
@@ -44,12 +49,20 @@ export function useUser() {
         isLoading.value = false
     }
   }
-   
+
+  const handleLogin = async () => {
+  await loginUser(payload.value)
+  if (!errorResponse.value) {
+  alert('¡Bienvenido al sistema!')
+  router.push('/dashboard') 
+    }
+    }
   return { 
     data, 
     errorResponse, 
     isLoading, 
     createUser, 
-    loginUser 
+    loginUser ,
+    handleLogin, payload
   }
 }

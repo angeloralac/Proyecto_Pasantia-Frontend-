@@ -41,7 +41,6 @@ const router = createRouter({
         { path: 'usuarios', 
           component: UsuariosView 
         }
-
       ]
     }
   ]
