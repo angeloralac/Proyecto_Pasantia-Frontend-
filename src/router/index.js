@@ -6,7 +6,7 @@ import DashboardView from '../views/DashboardView.vue'
 import ArticulosView from '../views/ArticulosView.vue'
 import ClientesView from '@/views/ClientesView.vue'
 import UsuariosView from '@/views/UsuariosView.vue'
-
+import VentasView from '@/views/VentasView.vue' 
 
 const router = createRouter({
   history: createWebHistory(),
@@ -29,6 +29,7 @@ const router = createRouter({
       path: '/dashboard',
       name: 'dashboard',
       component: DashboardView,
+      meta: { requiresAuth: true },
       children: [
         {
           path: 'articulos', 
@@ -40,10 +41,26 @@ const router = createRouter({
         },
         { path: 'usuarios', 
           component: UsuariosView 
+        },
+        { path: 'ventas', 
+          name: 'ventas',
+          component: VentasView 
         }
       ]
     }
   ]
 })
+
+router.beforeEach((to, from, next) => {
+  const isAuthenticated = !!localStorage.getItem('token')
+
+  if (to.meta.requiresAuth && !isAuthenticated) {
+    next('/login') 
+  } else if (to.name === 'login' && isAuthenticated) {
+    next({ name: 'dashboard' })
+  }
+    next() 
+  }
+)
 
 export default router

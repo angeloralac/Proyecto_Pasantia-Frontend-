@@ -1,8 +1,10 @@
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import apiClient from '../api/axios' 
 import { useUserRepo } from './useUserRepo'
 
 export function useUser() {
+  const router = useRouter()
   const data = ref(null)
   const errorResponse = ref(null) 
   const isLoading = ref(false)
