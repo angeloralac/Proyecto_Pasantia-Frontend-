@@ -1,27 +1,60 @@
 <script setup>
-const categorias = [
-  { title: 'Usuarios', icon: 'mdi-account-group', value: 'usuarios', to: '/dashboard/usuarios' },
-  { title: 'Artículos', icon: 'mdi-package-variant-closed', value: 'articulos', to: '/dashboard/articulos' },
-  { title: 'Clientes', icon: 'mdi-account-box', value: 'clientes', to: '/dashboard/clientes' },
-  { title: 'Ventas', icon: 'mdi-cash-register', value: 'ventas', to: '/dashboard/ventas' }
-]
+// Ya no necesitamos declarar el arreglo categorias aquí porque 
+// estamos usando los v-list-item directamente abajo de forma limpia.
 </script>
 
 <template>
-  <v-navigation-drawer location="left" permanent class="bg-grey-lighten-4 pa-2">
-    <div class="text-subtitle-1 font-weight-bold pa-3">Menú Principal</div>
-    <v-divider class="mb-2"></v-divider>
+  <v-navigation-drawer app permanent>
+    <!-- Título o logo de la aplicación -->
+    <div class="pa-4">
+      <h3 class="text-h6 font-weight-bold text-primary">Punto de Venta</h3>
+      <p class="text-caption text-medium-emphasis">Panel de Control</p>
+    </div>
 
-    <v-list density="comfortable" nav>
-      <!-- Un solo botón directo por categoría -->
+    <v-divider></v-divider>
+    
+    <v-list density="compact" nav class="pa-2">
+      
+      <!-- Inicio / Dashboard -->
       <v-list-item 
-        v-for="cat in categorias" 
-        :key="cat.value"
-        :prepend-icon="cat.icon" 
-        :title="cat.title"
-        :to="cat.to"
-        color="primary"
-      ></v-list-item>
+        title="Inicio" 
+        prepend-icon="mdi-view-dashboard" 
+        to="/dashboard" 
+        value="inicio"
+        exact
+      />
+
+      <!-- SECCIÓN 1: Operación Diaria -->
+      <v-list-item title="Usuarios" prepend-icon="mdi-account-group" to="/dashboard/usuarios" value="usuarios" />
+      <v-list-item title="Artículos" prepend-icon="mdi-package-variant-closed" to="/dashboard/articulos" value="articulos" />
+      <v-list-item title="Clientes" prepend-icon="mdi-account-box" to="/dashboard/clientes" value="clientes" />
+      <v-list-item title="Ventas" prepend-icon="mdi-cash-register" to="/dashboard/ventas" value="ventas" />
+
+      <!-- LÍNEA DIVISORIA -->
+      <v-divider class="my-3"></v-divider>
+
+      <!-- SECCIÓN 2: Reportes y Análisis (Más Resaltado) -->
+      <v-list-subheader class="text-uppercase font-weight-bold text-primary px-2 mb-1">
+        Análisis y Reportes
+      </v-list-subheader>
+
+      <!-- Sub-opción: Inventario y Alertas -->
+      <v-list-item 
+        title="Inventario y Alertas" 
+        prepend-icon="mdi-alert-box-outline" 
+        to="/dashboard/inventario" 
+        value="inventario" 
+        class="mb-1"
+      />
+
+      <!-- Sub-opción: Reporte de Ventas -->
+      <v-list-item 
+        title="Reporte de Ventas" 
+        prepend-icon="mdi-chart-bar" 
+        to="/dashboard/reportes" 
+        value="reportes" 
+      />
+
     </v-list>
   </v-navigation-drawer>
 </template>

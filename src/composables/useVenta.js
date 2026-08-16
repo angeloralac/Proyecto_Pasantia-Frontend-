@@ -237,6 +237,8 @@ const cargandoVentas = ref(false)
     }
   }
 
+
+
   return {
     busqueda,
     articulosObtenidos,

@@ -3,7 +3,6 @@ import ClienteSelector from '@/components/ventas/clienteSelector.vue'
 import VentaBuscador from '@/components/ventas/ventaBuscador.vue'
 import VentaCarrito from '@/components/ventas/ventaCarrito.vue'
 import VentaSnackbar from '@/components/ventas/ventaSnackBar.vue'
-import VentasRealizadas from '@/components/ventas/obtenerVentas.vue'
 </script>
 
 <template>
@@ -27,12 +26,6 @@ import VentasRealizadas from '@/components/ventas/obtenerVentas.vue'
       <!-- Resumen del Carrito -->
       <v-col cols="12" md="5" lg="4">
         <VentaCarrito />
-      </v-col>
-    </v-row>
-    <!-- 3. Historial de ventas realizadas -->
-    <v-row density="compact">
-      <v-col cols="12">
-        <VentasRealizadas />
       </v-col>
     </v-row>
 

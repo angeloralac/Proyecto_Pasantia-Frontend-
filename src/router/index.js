@@ -7,6 +7,9 @@ import ArticulosView from '../views/ArticulosView.vue'
 import ClientesView from '@/views/ClientesView.vue'
 import UsuariosView from '@/views/UsuariosView.vue'
 import VentasView from '@/views/VentasView.vue' 
+import ReportesView from '@/views/ReportesView.vue'
+import InicioView from '@/views/InicioView.vue'
+import InventarioView from '@/views/InventariosView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -32,6 +35,12 @@ const router = createRouter({
       meta: { requiresAuth: true },
       children: [
         {
+          path: '', 
+          name: 'inicio',
+          component: InicioView
+        },
+
+        {
           path: 'articulos', 
           name: 'articulos',
           component: ArticulosView
@@ -45,6 +54,16 @@ const router = createRouter({
         { path: 'ventas', 
           name: 'ventas',
           component: VentasView 
+        },
+        {
+          path: 'reportes',
+          name: 'reportes',
+          component: ReportesView
+        },
+        {
+          path: 'inventario',
+          name: 'inventario',
+          component: InventarioView
         }
       ]
     }
