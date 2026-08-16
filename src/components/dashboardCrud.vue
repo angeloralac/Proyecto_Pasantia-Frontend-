@@ -33,7 +33,7 @@
       <!-- LÍNEA DIVISORIA -->
       <v-divider class="my-3"></v-divider>
 
-      <!-- SECCIÓN 2: Reportes y Análisis (Más Resaltado) -->
+      <!-- SECCIÓN 2: Reportes y Análisis -->
       <v-list-subheader class="text-uppercase font-weight-bold text-primary px-2 mb-1">
         Análisis y Reportes
       </v-list-subheader>
@@ -54,6 +54,31 @@
         to="/dashboard/reportes" 
         value="reportes" 
       />
+
+      <!-- LÍNEA DIVISORIA -->
+      <v-divider class="my-3"></v-divider>
+
+      <!-- SECCIÓN: Control de caja -->
+<v-list-subheader class="text-uppercase font-weight-bold text-primary px-2 mb-1">
+  Control de caja
+</v-list-subheader>
+
+<!-- Opción 1: Caja (Apertura y Cierre) -->
+<v-list-item 
+  title="Caja" 
+  prepend-icon="mdi-safe" 
+  to="/dashboard/caja" 
+  value="caja" 
+  class="mb-1"
+/>
+
+<!-- Opción 2: Historial de Turnos -->
+<v-list-item 
+  title="Historial de Turnos" 
+  prepend-icon="mdi-history" 
+  to="/dashboard/caja/historial" 
+  value="historial-caja" 
+/>
 
     </v-list>
   </v-navigation-drawer>

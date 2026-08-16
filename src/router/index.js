@@ -10,6 +10,8 @@ import VentasView from '@/views/VentasView.vue'
 import ReportesView from '@/views/ReportesView.vue'
 import InicioView from '@/views/InicioView.vue'
 import InventarioView from '@/views/InventariosView.vue'
+import CajaView from '@/views/CajasView.vue'
+import HistorialCajaView from '@/views/HistorialCajasView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -39,19 +41,23 @@ const router = createRouter({
           name: 'inicio',
           component: InicioView
         },
-
         {
           path: 'articulos', 
           name: 'articulos',
           component: ArticulosView
         },
-        { path: 'clientes', 
+        { 
+          path: 'clientes', 
+          name: 'clientes',
           component: ClientesView 
         },
-        { path: 'usuarios', 
+        { 
+          path: 'usuarios', 
+          name: 'usuarios',
           component: UsuariosView 
         },
-        { path: 'ventas', 
+        { 
+          path: 'ventas', 
           name: 'ventas',
           component: VentasView 
         },
@@ -64,7 +70,18 @@ const router = createRouter({
           path: 'inventario',
           name: 'inventario',
           component: InventarioView
+        },
+        {
+          path: 'caja', // 
+          name: 'caja',
+          component: CajaView 
+        },
+        {
+          path: 'caja/historial',
+          name: 'historial-caja',
+          component: HistorialCajaView
         }
+
       ]
     }
   ]
@@ -78,8 +95,7 @@ router.beforeEach((to, from, next) => {
   } else if (to.name === 'login' && isAuthenticated) {
     next({ name: 'dashboard' })
   }
-    next() 
-  }
-)
+  next() 
+})
 
 export default router
