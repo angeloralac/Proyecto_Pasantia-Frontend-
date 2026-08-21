@@ -26,6 +26,8 @@ onMounted(() => {
 const handleLogout = () => {
   localStorage.removeItem('token')
   localStorage.removeItem('user')
+  localStorage.removeItem('refreshToken')
+  localStorage.removeItem('userId')
   
   alert('Saliendo del sistema...')
   router.push('/login')

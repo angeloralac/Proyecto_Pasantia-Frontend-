@@ -22,6 +22,7 @@ const { getAll: getAllRepo, createuser: createUserRepo } = useUserRepo();
         data.value = await createUserRepo(payload)
         
         localStorage.setItem('token', data.value.token)
+        localStorage.setItem('refreshToken', data.value.refreshToken)
         localStorage.setItem('user', JSON.stringify(data.value.user))
 
     } catch (error) {
@@ -41,6 +42,7 @@ const { getAll: getAllRepo, createuser: createUserRepo } = useUserRepo();
         data.value = response.data
         
         localStorage.setItem('token', data.value.token)
+        localStorage.setItem('refreshToken', data.value.refreshToken)
         localStorage.setItem('userId', response.data.user.id)
        localStorage.setItem('user', JSON.stringify(data.value.user))
       

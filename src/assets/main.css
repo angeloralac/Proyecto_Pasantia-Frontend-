@@ -33,3 +33,47 @@ a,
     padding: 0 2rem;
   }
 }
+/* Borramos los grids de Vite que rompían el diseño y dejamos solo las reglas de impresión para Vuetify */
+
+@media print {
+  /* 1. Apagar el menú lateral y barra superior de Vuetify */
+  .v-navigation-drawer,
+  .v-app-bar,
+  header {
+    display: none !important;
+  }
+
+  /* 2. EL TRUCO CLAVE: Vuetify empuja el contenido para hacerle espacio al menú. 
+        Al imprimir, forzamos esos espacios a cero para que el reporte ocupe toda la hoja. */
+  .v-main {
+    padding: 0 !important;
+    --v-layout-left: 0px !important;
+    --v-layout-right: 0px !important;
+    --v-layout-top: 0px !important;
+    --v-layout-bottom: 0px !important;
+  }
+
+  /* 3. Ocultamos el botón de imprimir y la barra de búsqueda */
+  .no-print, 
+  .v-text-field {
+    display: none !important;
+  }
+
+  /* 4. Forzamos a la aplicación a usar fondo blanco y el 100% del ancho de la hoja física */
+  .v-application, 
+  .v-application__wrap, 
+  .v-container {
+    background: white !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    min-height: auto !important;
+  }
+
+  /* 5. Quitamos las sombras a las tarjetas para que parezca un documento formal impreso */
+  .v-card {
+    border: none !important;
+    box-shadow: none !important;
+  }
+}

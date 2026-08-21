@@ -1,6 +1,5 @@
 <script setup>
-// Ya no necesitamos declarar el arreglo categorias aquí porque 
-// estamos usando los v-list-item directamente abajo de forma limpia.
+
 </script>
 
 <template>
@@ -38,9 +37,9 @@
         Análisis y Reportes
       </v-list-subheader>
 
-      <!-- Sub-opción: Inventario y Alertas -->
+      <!-- Sub-opción: Inventario -->
       <v-list-item 
-        title="Inventario y Alertas" 
+        title="Inventario y Stock" 
         prepend-icon="mdi-alert-box-outline" 
         to="/dashboard/inventario" 
         value="inventario" 

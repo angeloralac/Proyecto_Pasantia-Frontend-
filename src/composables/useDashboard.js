@@ -1,15 +1,13 @@
 import { ref } from 'vue';
+import apiClient from '@/api/axios';
 
 export function useDashboard() {
   const cargando = ref(false);
 
-  // Valores iniciales (en 0) para que tu vista no marque error mientras espera al servidor
+  // Valores iniciales
   const metricasHoy = ref({ total: 0, cantidad: 0 });
   const metricasMes = ref({ totalMes: 0, esperado: 10000, porcentaje: 0 });
   const ventasRecientes = ref([]);
-
-  // La nueva ruta que creamos en tu backend
-  const baseUrl = 'http://localhost:3000/ventas';
 
   // Asistente para agrupar facturas repetidas y contar los artículos
   const agruparFacturas = (datosRaw) => {
@@ -20,7 +18,6 @@ export function useDashboard() {
         facturasAgrupadas.set(venta.factura, { 
           ...venta, 
           total: parseFloat(venta.total || 0),
-          // Iniciamos el contador de líneas de artículos
           cantidadArticulos: 1 
         });
       } else {
@@ -30,17 +27,15 @@ export function useDashboard() {
       }
     });
 
-    // Devolvemos el arreglo, pero cortamos (slice) solo los primeros 5 registros para no saturar tu dashboard
     return Array.from(facturasAgrupadas.values()).slice(0, 5);
   };
 
   const cargarMetricas = async () => {
     cargando.value = true;
     try {
-      const respuesta = await fetch(`${baseUrl}/metricas/dashboard`); 
-      if (!respuesta.ok) throw new Error('Error al obtener datos del dashboard');
+      const respuesta = await apiClient.get('/ventas/metricas/dashboard');
       
-      const datos = await respuesta.json();
+      const datos = respuesta.data;
 
       // Repartimos el paquete JSON en nuestras variables reactivas
       metricasHoy.value = datos.hoy;
@@ -54,7 +49,7 @@ export function useDashboard() {
     }
   };
 
-  // Formateador automático para que el dinero salga como "Q 1,250.00"
+  // Formateador automático de moneda
   const formatearMoneda = (cantidad) => {
     return new Intl.NumberFormat('es-GT', {
       style: 'currency',
@@ -62,7 +57,7 @@ export function useDashboard() {
     }).format(cantidad || 0);
   };
 
-  // Formateador para sacar solo la hora ("10:15 AM") del createdAt de la base de datos
+  // Formateador de hora
   const formatearHora = (fechaISO) => {
     if (!fechaISO) return '';
     return new Date(fechaISO).toLocaleTimeString('es-GT', { 

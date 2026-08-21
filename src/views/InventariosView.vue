@@ -2,13 +2,17 @@
 import { onMounted } from 'vue';
 import { useInventario } from '../composables/useInventario';
 
+const imprimirReporte = () => {
+  window.print();
+};
+
 const {
   cargando,
   terminoBusqueda,
   articulosFiltrados,
   articulosAgotados,
   articulosEnRiesgo,
-  articulos, // Aún lo necesitamos para contar el total general en las tarjetas
+  articulos, 
   obtenerInventario,
   formatearMoneda
 } = useInventario();
@@ -27,11 +31,19 @@ const obtenerEstadoStock = (stock) => {
 <template>
   <v-container fluid class="bg-background pa-6 h-100">
     
-    <div class="mb-6">
-      <h2 class="text-h5 font-weight-bold">Estado del Inventario</h2>
-      <p class="text-medium-emphasis">Monitorea tus existencias físicas y alertas de reabastecimiento</p>
+    <!-- Encabezado con título y botón de impresión alineados profesionalmente -->
+    <div class="mb-6 d-flex justify-space-between align-center flex-wrap gap-4">
+      <div>
+        <h2 class="text-h5 font-weight-bold">Estado del Inventario</h2>
+        <p class="text-medium-emphasis">Monitorea tus existencias físicas y alertas de reabastecimiento</p>
+      </div>
+      
+      <v-btn color="error" variant="tonal" prepend-icon="mdi-printer" @click="imprimirReporte" class="no-print">
+        Imprimir / Guardar PDF
+      </v-btn>
     </div>
 
+    <div id="area-impresion">
     <!-- Panel Superior de Alertas -->
     <v-row class="mb-6">
       <v-col cols="12" md="4">
@@ -87,7 +99,6 @@ const obtenerEstadoStock = (stock) => {
           Nivel de Existencias
         </div>
         
-        <!-- NUEVO: Campo de Búsqueda -->
         <v-text-field
           v-model="terminoBusqueda"
           label="Buscar por código o nombre..."
@@ -115,14 +126,12 @@ const obtenerEstadoStock = (stock) => {
           </tr>
         </thead>
         <tbody>
-          <!-- Mensaje si no hay registros en absoluto o si la búsqueda no arroja resultados -->
           <tr v-if="articulosFiltrados.length === 0 && !cargando">
             <td colspan="5" class="text-center text-medium-emphasis py-10 font-italic">
               {{ terminoBusqueda ? 'No se encontraron artículos que coincidan con tu búsqueda.' : 'No hay artículos registrados en el catálogo.' }}
             </td>
           </tr>
           
-          <!-- Iteramos sobre la lista FILTRADA, no la general -->
           <tr v-for="item in articulosFiltrados" :key="item.codigo">
             <td class="font-weight-medium text-medium-emphasis">{{ item.codigo_barras || item.codigo }}</td>
             <td class="font-weight-medium">{{ item.nombre }}</td>
@@ -148,6 +157,7 @@ const obtenerEstadoStock = (stock) => {
       </v-table>
     </v-card>
 
+    </div>
   </v-container>
 </template>
 
@@ -158,4 +168,5 @@ const obtenerEstadoStock = (stock) => {
 .gap-4 {
   gap: 16px;
 }
+
 </style>

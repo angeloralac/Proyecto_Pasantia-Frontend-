@@ -10,8 +10,8 @@ export function useUserRepo () {
     }
     
     const createuser = async(payload)=> {
-
-         return await apiClient.post('/users', payload).data
+            const response = await apiClient.post('/users', payload)
+            return response.data
 
     }
 

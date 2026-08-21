@@ -1,4 +1,5 @@
 import { ref, computed } from 'vue';
+import apiClient from '@/api/axios';
 
 export function useInventario() {
   const articulos = ref([]);
@@ -12,9 +13,8 @@ export function useInventario() {
   const obtenerInventario = async () => {
     cargando.value = true;
     try {
-      const respuesta = await fetch(baseUrl);
-      if (!respuesta.ok) throw new Error('Error al obtener el inventario');
-      articulos.value = await respuesta.json();
+      const respuesta = await apiClient.get('/articulos');
+      articulos.value = respuesta.data;
     } catch (error) {
       console.error(error);
     } finally {

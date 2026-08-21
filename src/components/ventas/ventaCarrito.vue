@@ -8,7 +8,8 @@ const {
   formatPrecio,
   recalcularTotalFila,
   eliminarDelCarrito,
-  procesarVenta
+  procesarVenta, 
+  limpiarEstado
 } = useVenta()
 </script>
 

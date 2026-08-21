@@ -1,8 +1,6 @@
 import { ref, computed } from 'vue'
-import axios from 'axios'
+import apiClient from '@/api/axios' 
 
-
-  const API_URL = 'http://localhost:3000'
   const busqueda = ref('')
   const articulosObtenidos = ref([])
   const carrito = ref([])
@@ -14,8 +12,8 @@ import axios from 'axios'
   const clienteSeleccionado = ref(null)
   const buscandoCliente = ref(false)
 
-const ventasRealizadas = ref([])
-const cargandoVentas = ref(false)
+  const ventasRealizadas = ref([])
+  const cargandoVentas = ref(false)
   
   const snackbar = ref({
     show: false,
@@ -23,8 +21,25 @@ const cargandoVentas = ref(false)
     color: 'success'
   })
 
+  
+  const totalVenta = computed(() => {
+    return carrito.value.reduce((total, prod) => {
+      return total + (parseFloat(prod.total) || 0)
+    }, 0)
+  })
+  
   export function useVenta() {
   
+
+  const limpiarEstado = () => {
+    carrito.value = []
+    busqueda.value = ''
+    articulosObtenidos.value = []
+    busquedaRealizada.value = false
+    clienteIdBusqueda.value = ''
+    clienteSeleccionado.value = null
+  }
+
   // Función helper para formatear precios
   const formatPrecio = (precio) => {
     if (precio === undefined || precio === null || precio === '') return '0.00'
@@ -36,7 +51,6 @@ const cargandoVentas = ref(false)
     snackbar.value = { show: true, message, color }
   }
 
-  // 1. CORREGIDO: Búsqueda y mapeo seguro del cliente
   const buscarCliente = async () => {
     if (!clienteIdBusqueda.value) {
       clienteSeleccionado.value = null
@@ -45,10 +59,11 @@ const cargandoVentas = ref(false)
     }
     buscandoCliente.value = true
     try {
-      const response = await axios.get(`${API_URL}/clientes/${clienteIdBusqueda.value}`)
-      console.log('Respuesta servidor cliente:', response.data)
-
-      // Soporta si el backend devuelve un objeto directo, un array o respuesta envuelta
+      const token = localStorage.getItem('token');
+      const response = await apiClient.get(`/clientes/${clienteIdBusqueda.value}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+      
       const clienteData = Array.isArray(response.data) 
         ? response.data[0] 
         : (response.data.data || response.data)
@@ -84,11 +99,11 @@ const cargandoVentas = ref(false)
     busquedaRealizada.value = true
 
     try {
-      const response = await axios.get(`${API_URL}/articulos/search`, {
-        params: { q: busqueda.value }
+      const token = localStorage.getItem('token');
+      const response = await apiClient.get('/articulos/search', {
+        params: { q: busqueda.value },
+        headers: { 'Authorization': `Bearer ${token}` }
       })
-
-      console.log('Respuesta del backend:', response.data)
 
       if (Array.isArray(response.data)) {
         articulosObtenidos.value = response.data.map(item => ({
@@ -116,10 +131,7 @@ const cargandoVentas = ref(false)
   }
 
   const agregarAlCarrito = (item) => {
-    console.log('¡El botón funciona y me envió este ítem!', item)
-    alert('Clic recibido')
     const itemId = item.id || item.codigo
-
     const precioVenta = parseFloat(item.precioVenta || item.precio_venta) || 0
     const precioCosto = parseFloat(item.precioCosto || item.precio_costo) || 0
     const stock = parseInt(item.stock) || 0
@@ -163,13 +175,6 @@ const cargandoVentas = ref(false)
     mostrarMensaje(`${producto.nombre || 'Producto'} eliminado del carrito`, 'info')
   }
 
-  const totalVenta = computed(() => {
-    return carrito.value.reduce((total, prod) => {
-      return total + (parseFloat(prod.total) || 0)
-    }, 0)
-  })
-
-  // 2. CORREGIDO: Envío únicamente del ID del cliente (no del objeto completo)
   const procesarVenta = async () => {
     if (carrito.value.length === 0) {
       mostrarMensaje('El carrito está vacío', 'warning')
@@ -180,10 +185,8 @@ const cargandoVentas = ref(false)
 
     try {
       const payload = {
-        
         clienteId: clienteSeleccionado.value ? clienteSeleccionado.value.id : null,
-        usuarioId: 1, // PONEMOS EL ID 1 DE FORMA FIJA PARA PROBAR
-        
+        usuarioId: 1, 
         productos: carrito.value.map(p => ({
           cantidad: parseInt(p.cantidad) || 1,
           precioCosto: parseFloat(p.precioCosto) || 0,
@@ -192,26 +195,20 @@ const cargandoVentas = ref(false)
           total: parseFloat(p.total) || 0,
           articuloId: p.articuloId
         }))
-
       }
 
-      console.log('Payload enviado:', JSON.stringify(payload, null, 2))
-
-      const response = await axios.post(`${API_URL}/ventas/store`, payload)
+      const token = localStorage.getItem('token');
+      const response = await apiClient.post('/ventas/store', payload, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
 
       mostrarMensaje(`¡Venta registrada exitosamente! Factura: ${response.data.factura || 'Generada'}`, 'success')
 
-      // Limpiar todo
-      carrito.value = []
-      busqueda.value = ''
-      articulosObtenidos.value = []
-      busquedaRealizada.value = false
-      limpiarCliente()
+      // Limpiar todo después de vender
+      limpiarEstado()
       obtenerVentas()
 
     } catch (error) {
-      console.error('Error procesando la venta:', error)
-
       if (error.response) {
         mostrarMensaje(`Error: ${error.response.data.error || error.response.data.mensaje || 'Error del servidor'}`, 'error')
       } else if (error.request) {
@@ -227,17 +224,17 @@ const cargandoVentas = ref(false)
   const obtenerVentas = async () => {
     cargandoVentas.value = true
     try {
-      const response = await axios.get(`${API_URL}/ventas`)
+      const token = localStorage.getItem('token');
+      const response = await apiClient.get('/ventas', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
       ventasRealizadas.value = response.data
     } catch (error) {
-      console.error('Error al cargar el historial de ventas:', error)
       mostrarMensaje('No se pudo cargar el historial de ventas', 'error')
     } finally {
       cargandoVentas.value = false
     }
   }
-
-
 
   return {
     busqueda,
@@ -263,5 +260,6 @@ const cargandoVentas = ref(false)
     eliminarDelCarrito,
     procesarVenta,
     obtenerVentas,
+    limpiarEstado
   }
 }

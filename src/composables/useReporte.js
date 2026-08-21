@@ -1,20 +1,24 @@
 import { ref } from 'vue';
+import apiClient from '@/api/axios';
+
 
 export function useVentas() {
   // Estados reactivos
   const ventas = ref([]);
   const topArticulos = ref([]); 
+  const ventasDetalladas = ref([]); // NUEVO: Almacena el desglose por factura
   const cargando = ref(false);
   
   // Variables para las búsquedas y filtros
   const terminoFactura = ref('');
+  const terminoFacturaDetalle = ref(''); // NUEVO: Buscador exclusivo para la pestaña de detalles
   const fechaInicio = ref('');
   const fechaFin = ref('');
 
   // Ruta principal de tu API
   const baseUrl = 'http://localhost:3000/ventas';
 
-  // Función para agrupar facturas repetidas y sumar sus totales
+  // Función para agrupar facturas repetidas y sumar sus totales (Historial General)
   const agruparFacturas = (datosRaw) => {
     const facturasAgrupadas = new Map();
     datosRaw.forEach(venta => {
@@ -32,31 +36,48 @@ export function useVentas() {
     return Array.from(facturasAgrupadas.values());
   };
 
-  // NUEVA FUNCIÓN: Obtener Top de Artículos
+  // NUEVA FUNCIÓN: Obtener detalles de ventas (las últimas 3 o una específica)
+  const obtenerVentasDetalladas = async (factura = null) => {
+    cargando.value = true;
+    try {
+      const url = `${baseUrl}/detalles/ultimas`;
+      if (factura) url += `?factura=${factura}`;
+      
+      const respuesta = await apiClient.get(url);
+      
+      ventasDetalladas.value = agruparDetalles(respuesta.data);
+    } catch (error) {
+      console.error(error);
+      ventasDetalladas.value = [];
+    } finally {
+      cargando.value = false;
+    }
+  };
+
+  // Función: Obtener Top de Artículos
   const obtenerTopArticulos = async (inicio = null, fin = null) => {
     try {
-      let url = `${baseUrl}/top-articulos`;
+      const url = `${baseUrl}/top-articulos`;
       if (inicio && fin) {
         url += `?fechaInicio=${inicio}&fechaFin=${fin}`;
       }
-      const respuesta = await fetch(url);
-      if (respuesta.ok) topArticulos.value = await respuesta.json();
+      const respuesta = await apiClient.get(url);
+      topArticulos.value = respuesta.data;
     } catch (error) {
       console.error('Error al obtener top:', error);
     }
   };
 
-
   // Ejecuta: router.get('/ultimasventas', getUltimasVentas);
   const obtenerUltimasVentas = async () => {
     cargando.value = true;
     try {
-      const respuesta = await fetch(`${baseUrl}/ultimasventas`); 
-      if (!respuesta.ok) throw new Error('Error al obtener últimas ventas');
-      ventas.value = agruparFacturas(await respuesta.json()); 
+      const respuesta = await apiClient.get('/ventas/ultimasventas');
+      ventas.value = agruparFacturas(respuesta.data);
       
-      // Llamamos al top para que se cargue al entrar a la pantalla
+      // Llamamos al top y a los detalles para que se carguen al entrar a la pantalla
       await obtenerTopArticulos(); 
+      await obtenerVentasDetalladas(); // NUEVO: Carga las últimas 3 facturas detalladas por defecto
     } catch (error) {
       console.error(error);
     } finally {
@@ -68,9 +89,8 @@ export function useVentas() {
   const obtenerTodasLasVentas = async () => {
     cargando.value = true;
     try {
-      const respuesta = await fetch(baseUrl);
-      if (!respuesta.ok) throw new Error('Error al obtener el historial completo');
-      ventas.value = agruparFacturas(await respuesta.json()); 
+      const respuesta = await apiClient.get('/ventas');
+      ventas.value = agruparFacturas(respuesta.data);
       
       // Actualizamos el top general
       await obtenerTopArticulos(); 
@@ -86,12 +106,8 @@ export function useVentas() {
     if (!terminoFactura.value) return; 
     cargando.value = true;
     try {
-      const respuesta = await fetch(`${baseUrl}/factura/${terminoFactura.value}`); 
-      if (!respuesta.ok) {
-        ventas.value = [];
-        throw new Error('Factura no encontrada');
-      }
-      ventas.value = agruparFacturas(await respuesta.json()); 
+      const respuesta = await apiClient.get(`/ventas/factura/${terminoFactura.value}`);
+      ventas.value = agruparFacturas(respuesta.data);
     } catch (error) {
       console.error(error);
     } finally {
@@ -99,7 +115,7 @@ export function useVentas() {
     }
   };
 
-  // NUEVA FUNCIÓN: Busca por el rango de fechas (Desde - Hasta)
+  // Función: Busca por el rango de fechas (Desde - Hasta)
   const buscarPorRango = async () => {
     if (!fechaInicio.value || !fechaFin.value) return;
 
@@ -109,12 +125,10 @@ export function useVentas() {
       const inicio = `${fechaInicio.value}T00:00:00`;
       const fin = `${fechaFin.value}T23:59:59`;
 
-      const respuesta = await fetch(`${baseUrl}?fechaInicio=${inicio}&fechaFin=${fin}`); 
-      if (!respuesta.ok) {
-        ventas.value = [];
-        throw new Error('No se encontraron ventas en este rango de fechas');
-      }
-      ventas.value = agruparFacturas(await respuesta.json()); 
+      const respuesta = await apiClient.get('/ventas', {
+        params: { fechaInicio: inicio, fechaFin: fin }
+      });
+      ventas.value = agruparFacturas(respuesta.data);
       
       // Filtramos también el top con las mismas fechas
       await obtenerTopArticulos(inicio, fin);
@@ -127,6 +141,7 @@ export function useVentas() {
 
   const limpiarFiltros = () => {
     terminoFactura.value = '';
+    terminoFacturaDetalle.value = ''; // NUEVO: Limpia el buscador de detalles
     fechaInicio.value = '';
     fechaFin.value = '';
     obtenerUltimasVentas(); 
@@ -142,18 +157,42 @@ export function useVentas() {
     }); 
   };
 
+  // Función para ordenar y agrupar los artículos en su respectiva factura (Detallado)
+  const agruparDetalles = (datosRaw) => {
+    const grupos = {};
+    datosRaw.forEach(item => {
+      if (!grupos[item.factura]) {
+        grupos[item.factura] = {
+          factura: item.factura,
+          fecha: item.createdAt,
+          vendedor: item.vendedor,
+          cliente: item.cliente, // <-- NUEVO: Guardamos el cliente
+          totalFactura: 0,
+          articulos: []
+        };
+      }
+      grupos[item.factura].articulos.push(item);
+      grupos[item.factura].totalFactura += parseFloat(item.total);
+    });
+    return Object.values(grupos);
+  };
+
   return {
     ventas,
-    topArticulos, 
+    topArticulos,
+    ventasDetalladas, // NUEVO: Exportado a la vista
     cargando,
     terminoFactura,
+    terminoFacturaDetalle, // NUEVO: Exportado a la vista
     fechaInicio,
     fechaFin,
     obtenerUltimasVentas,
     obtenerTodasLasVentas,
+    obtenerVentasDetalladas, // NUEVO: Exportado a la vista
     buscarPorFactura,
     buscarPorRango,
     limpiarFiltros,
     formatearFecha,
+    agruparDetalles, // NUEVO: Exportado a la vista
   };
 }
